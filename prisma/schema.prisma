@@ -1,0 +1,61 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["multiSchema"]
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model User {
+  id             String       @id @default(uuid())
+  name           String
+  email          String       @unique
+  totalSpaceUsed Int          @default(0)
+  files          File[] // Relation to File model
+  shared         SharedFile[] @relation("SharedWith") // Files shared with this user
+  sharedBy       SharedFile[] @relation("SharedBy") // Files shared by this user
+  createdAt      DateTime     @default(now())
+  updatedAt      DateTime     @updatedAt
+}
+
+model File {
+  id        String       @id @default(uuid())
+  userId    String
+  user      User         @relation(fields: [userId], references: [id])
+  fileName  String
+  fileKey   String       @unique
+  fileUrl   String
+  size      Int
+  type      String
+  shared    SharedFile[]
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+}
+
+model SharedFile {
+  id           String      @id @default(uuid())
+  fileId       String
+  file         File        @relation(fields: [fileId], references: [id])
+  sharedById   String
+  sharedBy     User        @relation("SharedBy", fields: [sharedById], references: [id])
+  sharedWithId String
+  sharedWith   User        @relation("SharedWith", fields: [sharedWithId], references: [id])
+  accessLevel  AccessLevel
+  sharedAt     DateTime    @default(now())
+  expiration   DateTime?
+}
+
+enum AccessLevel {
+  VIEW
+  EDIT
+  DOWNLOAD
+}

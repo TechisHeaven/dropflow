@@ -5,6 +5,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { DocumentCardsProps } from "@/types/main.types";
 import {
   Download,
   Edit2,
@@ -16,26 +17,40 @@ import {
   Trash,
   UserPlus,
 } from "lucide-react";
+import Link from "next/link";
 import React from "react";
 
-const Card = ({ item }) => {
+const Card = ({ item }: { item: DocumentCardsProps }) => {
+  function formatDate(date: Date): string {
+    const dateFromPrisma = new Date(date);
+    const formatter = new Intl.DateTimeFormat("en-US", {
+      month: "long",
+      day: "numeric",
+      year: "numeric",
+    });
+    return formatter.format(dateFromPrisma);
+  }
   return (
     <div className="p-1 bg-gray-100 rounded-2xl">
       <div className="heading inline-flex items-center justify-between p-4 w-full">
         <div className="inline-flex items-center  gap-2">
           <File />
-          Web Design
+          {item.fileName}
         </div>
         <CardDropDown />
       </div>
-      <div className="preview bg-white min-h-36 flex items-center justify-center">
+      <Link
+        href={item.fileUrl}
+        className="preview bg-white min-h-36 flex items-center justify-center"
+      >
         <Image className="w-10 h-10 text-mainColor" />
-      </div>
-      <div className="info p-4">
+      </Link>
+      <div className="info p-4 inline-flex gap-2 items-center">
         <Avatar className="w-8 h-8">
           <AvatarImage></AvatarImage>
           <AvatarFallback className="bg-black text-white">V</AvatarFallback>
         </Avatar>
+        <p>{formatDate(item.updatedAt)}</p>
       </div>
     </div>
   );

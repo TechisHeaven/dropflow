@@ -2,8 +2,15 @@ import FileUpload from "@/components/Upload/FileUpload";
 import React from "react";
 import DriveInfo from "./DriveInfo";
 import DocumentsCards from "./Cards/DocumentsCards";
+import { getFilesByUserId } from "@/action/s3/action";
+import { serverSupabase } from "@/utils/supabase/server/supabase.server";
+export default async function Dashboard() {
+  const {
+    data: { user },
+  } = await serverSupabase.auth.getUser();
 
-export default function Dashboard() {
+  const files = await getFilesByUserId(user!.id);
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-col gap-4">
@@ -16,7 +23,7 @@ export default function Dashboard() {
           <h1 className="font-semibold text-xl">All Documents</h1>
           <p>overview of every files or document that you have stored.</p>
         </div>
-        <DocumentsCards />
+        <DocumentsCards items={files || []} />
       </div>
     </div>
   );
