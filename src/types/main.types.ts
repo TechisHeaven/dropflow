@@ -8,4 +8,5 @@ export interface DocumentCardsProps {
   type: string;
   createdAt: Date;
   updatedAt: Date;
+  downloadUrl?: string;
 }

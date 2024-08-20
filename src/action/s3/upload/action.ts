@@ -1,6 +1,5 @@
 "use server";
 
-import prisma from "@/config/prisma.config";
 import s3Client from "@/utils/AWS/s3Upload.config";
 import { PutObjectCommand } from "@aws-sdk/client-s3";
 import { createFileUpload } from "../action";
@@ -12,13 +11,14 @@ import { generateFileKey } from "@/utils/generateUniqueKey";
 async function uploadFileToS3(
   file: Buffer,
   filename: string,
-  fileType: string
+  fileType: string,
+  fileKey: string
 ) {
   const fileBuffer = file;
 
   const params = {
     Bucket: process.env.NEXT_PUBLIC_AWS_BUCKET_NAME!,
-    Key: filename,
+    Key: fileKey,
     Body: fileBuffer,
     ContentType: fileType,
   };
@@ -48,7 +48,12 @@ export async function UploadFile(data: any) {
     // Generate unique file key
     const fileKey = generateFileKey(data.file.name);
     const name = data.file.name.replace(/\s+/g, "-");
-    const filename = await uploadFileToS3(buffer, name, data.file.type);
+    const filename = await uploadFileToS3(
+      buffer,
+      name,
+      data.file.type,
+      fileKey
+    );
 
     const fileUrl = `https://${process.env.NEXT_PUBLIC_AWS_BUCKET_NAME}.s3.${process.env.NEXT_PUBLIC_AWS_REGION}.amazonaws.com/${filename}`;
     const id = uuidv4();

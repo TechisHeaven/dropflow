@@ -19,7 +19,6 @@ export async function login(formData: FormData) {
     if (error) {
       return fromErrorToFormState(error);
     }
-    console.log(data, user);
     if (user) {
       return { redirectUrl: "/dashboard" }; // Return redirect URL instead
     }

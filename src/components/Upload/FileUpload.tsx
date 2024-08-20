@@ -2,7 +2,6 @@
 import { UploadFile } from "@/action/s3/upload/action";
 import { cn } from "@/lib/utils";
 import { useUploadStore } from "@/store/upload.file.store";
-import { clientSupabase } from "@/utils/supabase/client/supabase.client";
 import Image from "next/image";
 import React, { useCallback, useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
