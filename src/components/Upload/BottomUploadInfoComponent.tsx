@@ -16,8 +16,6 @@ const BottomUploadInfoComponent = () => {
     setFileStatus,
   } = useUploadStore();
 
-  console.log(files);
-
   return (
     isVisible && (
       <div
@@ -50,13 +48,19 @@ const BottomUploadInfoComponent = () => {
                   <div>
                     {file.progress < 100 && file.status === "uploading" ? (
                       <Loader />
-                    ) : (
+                    ) : file.status === "completed" ? (
                       <>
                         <div className="bg-green-600 rounded-full transition-all text-black group-hover:hidden">
                           <Check />
                         </div>
                         <div className=" rounded-full transition-all text-black hidden group-hover:block">
                           <Folder />
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="bg-red-600 p-1 rounded-full transition-all text-black">
+                          <X className="w-4 h-4" />
                         </div>
                       </>
                     )}

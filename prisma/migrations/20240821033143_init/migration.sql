@@ -1,20 +1,13 @@
-/*
-  Warnings:
-
-  - You are about to drop the `User` table. If the table is not empty, all the data it contains will be lost.
-
-*/
 -- CreateEnum
 CREATE TYPE "AccessLevel" AS ENUM ('VIEW', 'EDIT', 'DOWNLOAD');
-
--- DropTable
-DROP TABLE "public"."User";
 
 -- CreateTable
 CREATE TABLE "User" (
     "id" TEXT NOT NULL,
     "name" TEXT NOT NULL,
     "email" TEXT NOT NULL,
+    "totalSpaceUsed" INTEGER NOT NULL DEFAULT 0,
+    "maxStorage" INTEGER NOT NULL DEFAULT 100000000,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

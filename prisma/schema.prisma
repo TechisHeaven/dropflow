@@ -20,6 +20,7 @@ model User {
   name           String
   email          String       @unique
   totalSpaceUsed Int          @default(0)
+  maxStorage     Int          @default(104857600)
   files          File[] // Relation to File model
   shared         SharedFile[] @relation("SharedWith") // Files shared with this user
   sharedBy       SharedFile[] @relation("SharedBy") // Files shared by this user

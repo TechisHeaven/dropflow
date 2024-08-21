@@ -81,7 +81,10 @@ const FileUpload = () => {
           if (result.status === 201) {
             setFileStatus(file.name, "completed");
             toast.success("File Uploaded Successfully");
+            return;
           }
+          console.log(result);
+          toast.success(result.message);
         }
       } catch (error) {
         newFiles.forEach((file) => setFileStatus(file.name, "failed"));
@@ -105,49 +108,43 @@ const FileUpload = () => {
   }
 
   return (
-    <>
-      <form action={UploadFile}>
-        <input type="file" name="file" id="file" />
-        <button type="submit">Send</button>
-      </form>
-      <div
-        key={"FileUpload"}
-        {...getRootProps()}
-        className={cn(
-          "flex flex-col items-center justify-center border-2  rounded-lg p-6 min-h-40 transition-colors duration-300 cursor-pointer",
-          isDragActive && "border-mainColor bg-blue-50"
-        )}
-      >
-        <div className="image">
-          <Image
-            src={"/file-upload-folder.png"}
-            alt="file upload folder image"
-            width={200}
-            height={200}
-          />
-          <h3 className="font-semibold text-lg">Upload your Files/Photos</h3>
-        </div>
-        <input {...getInputProps()} />
-        <div className="text-gray-600 text-center">
-          {isDragActive ? (
-            "Drop the files here ..."
-          ) : (
-            <p>
-              Drag & drop your files here, or{" "}
-              <span className="underline text-mainColor">choose files</span>
-            </p>
-          )}
-        </div>
-        {files?.map((file: FileUploadProps) => {
-          return (
-            <div>
-              {file.name} {convertFileSize(file.size)}
-            </div>
-          );
-        })}
-        <p className="text-xs text-gray-500 mt-2">Max file size: 2MB</p>
+    <div
+      key={"FileUpload"}
+      {...getRootProps()}
+      className={cn(
+        "flex flex-col items-center justify-center border-2  rounded-lg p-6 min-h-40 transition-colors duration-300 cursor-pointer",
+        isDragActive && "border-mainColor bg-blue-50"
+      )}
+    >
+      <div className="image">
+        <Image
+          src={"/file-upload-folder.png"}
+          alt="file upload folder image"
+          width={200}
+          height={200}
+        />
+        <h3 className="font-semibold text-lg">Upload your Files/Photos</h3>
       </div>
-    </>
+      <input {...getInputProps()} />
+      <div className="text-gray-600 text-center">
+        {isDragActive ? (
+          "Drop the files here ..."
+        ) : (
+          <p>
+            Drag & drop your files here, or{" "}
+            <span className="underline text-mainColor">choose files</span>
+          </p>
+        )}
+      </div>
+      {files?.map((file: FileUploadProps) => {
+        return (
+          <div>
+            {file.name} {convertFileSize(file.size)}
+          </div>
+        );
+      })}
+      <p className="text-xs text-gray-500 mt-2">Max file size: 2MB</p>
+    </div>
   );
 };
 

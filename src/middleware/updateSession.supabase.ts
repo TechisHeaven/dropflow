@@ -30,6 +30,7 @@ export async function updateSession(request: NextRequest) {
   );
   // Refreshing the auth token and checking the user's session
   const { data, error } = await supabase.auth.getUser();
+
   const currentUrl = new URL(request.url);
   // Check if user is authenticated and currently on the login page
   if (data.user && currentUrl.pathname === "/login") {

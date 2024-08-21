@@ -7,7 +7,10 @@ import { v4 as uuidv4 } from "uuid";
 import { serverSupabase } from "@/utils/supabase/server/supabase.server";
 import { revalidatePath } from "next/cache";
 import { generateFileKey } from "@/utils/generateUniqueKey";
+import prisma from "@/config/prisma.config";
+import { MAX_UPLOAD_SIZE } from "@/constants/main.constants";
 
+// Upload File to S3 Query
 async function uploadFileToS3(
   file: Buffer,
   filename: string,
@@ -36,12 +39,16 @@ async function uploadFileToS3(
   }
 }
 
+// Handle Upload File Action
 export async function UploadFile(data: any) {
   try {
     if (data?.size === 0) {
       return { status: 404, message: "Please Select a file" };
     }
-
+    // Check if the file exceeds the max upload size
+    if (data.file.size > MAX_UPLOAD_SIZE) {
+      return { status: 413, message: "File size exceeds the 5 MB limit" };
+    }
     const base64Data = data.base64.split(",")[1];
     const buffer = Buffer.from(base64Data, "base64");
 
@@ -62,6 +69,21 @@ export async function UploadFile(data: any) {
     } = await serverSupabase.auth.getUser();
 
     const userId = user?.id;
+    const userRecord = await prisma.user.findUnique({
+      where: { id: userId },
+      select: { totalSpaceUsed: true, maxStorage: true },
+    });
+
+    if (!userRecord) {
+      return { status: 401, message: "User not found" };
+    }
+
+    const totalSpaceUsed = userRecord.totalSpaceUsed;
+    const maxStorage = userRecord.maxStorage;
+
+    if (totalSpaceUsed + data.file.size > maxStorage) {
+      return { status: 403, message: "Storage limit exceeded" };
+    }
 
     const props = {
       id: id,
@@ -72,6 +94,13 @@ export async function UploadFile(data: any) {
       size: data.file.size,
       type: data.file.type,
     };
+
+    // Update the user's totalSpaceUsed
+    await prisma.user.update({
+      where: { id: userId },
+      data: { totalSpaceUsed: totalSpaceUsed + data.file.size },
+    });
+
     createFileUpload(props);
 
     revalidatePath("/dashboard");
